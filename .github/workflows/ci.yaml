@@ -14,7 +14,10 @@ jobs:
 
     - name: Restore dependencies
       run: dotnet restore TodoApp.sln
- 
+
+    - name: Restore dotnet tools
+      run: dotnet tool restore
+
     - name: dotnet build
       run: dotnet build TodoApp.sln -c Release --no-restore
 
