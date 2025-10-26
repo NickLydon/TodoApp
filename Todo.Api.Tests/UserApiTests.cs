@@ -12,7 +12,10 @@ public class UserApiTests
         await using var db = application.CreateTodoDbContext();
 
         var client = application.CreateClient();
-        var response = await client.PostAsJsonAsync("/users/register", new UserInfo { Email = "todouser@todoapp.com", Password = "@pwd" });
+        var response = await client.PostAsJsonAsync(
+            "/users/register",
+            new UserInfo { Email = "todouser@todoapp.com", Password = "@pwd" }
+        );
 
         Assert.True(response.IsSuccessStatusCode);
 
@@ -29,7 +32,10 @@ public class UserApiTests
         await using var db = application.CreateTodoDbContext();
 
         var client = application.CreateClient();
-        var response = await client.PostAsJsonAsync("/users/register", new UserInfo { Email = "todouser", Password = "" });
+        var response = await client.PostAsJsonAsync(
+            "/users/register",
+            new UserInfo { Email = "todouser", Password = "" }
+        );
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
@@ -41,7 +47,10 @@ public class UserApiTests
         // TODO: Follow up on the new errors
         // Assert.Equal(new[] { "The Password field is required." }, problemDetails.Errors["Password"]);
 
-        response = await client.PostAsJsonAsync("/users/register", new UserInfo { Email = "", Password = "password" });
+        response = await client.PostAsJsonAsync(
+            "/users/register",
+            new UserInfo { Email = "", Password = "password" }
+        );
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
@@ -53,8 +62,6 @@ public class UserApiTests
         // Assert.Equal(new[] { "The Username field is required." }, problemDetails.Errors["Username"]);
     }
 
-
-
     [Fact]
     public async Task MissingUsernameOrProviderKeyReturnsBadRequest()
     {
@@ -62,7 +69,10 @@ public class UserApiTests
         await using var db = application.CreateTodoDbContext();
 
         var client = application.CreateClient();
-        var response = await client.PostAsJsonAsync("/users/token/Google", new ExternalUserInfo { Username = "todouser" });
+        var response = await client.PostAsJsonAsync(
+            "/users/token/Google",
+            new ExternalUserInfo { Username = "todouser" }
+        );
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
@@ -71,9 +81,15 @@ public class UserApiTests
 
         Assert.Equal("One or more validation errors occurred.", problemDetails.Title);
         Assert.NotEmpty(problemDetails.Errors);
-        Assert.Equal(new[] { $"The {nameof(ExternalUserInfo.ProviderKey)} field is required." }, problemDetails.Errors[nameof(ExternalUserInfo.ProviderKey)]);
+        Assert.Equal(
+            new[] { $"The {nameof(ExternalUserInfo.ProviderKey)} field is required." },
+            problemDetails.Errors[nameof(ExternalUserInfo.ProviderKey)]
+        );
 
-        response = await client.PostAsJsonAsync("/users/token/Google", new ExternalUserInfo { ProviderKey = "somekey" });
+        response = await client.PostAsJsonAsync(
+            "/users/token/Google",
+            new ExternalUserInfo { ProviderKey = "somekey" }
+        );
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
@@ -82,7 +98,10 @@ public class UserApiTests
 
         Assert.Equal("One or more validation errors occurred.", problemDetails.Title);
         Assert.NotEmpty(problemDetails.Errors);
-        Assert.Equal(new[] { $"The Username field is required." }, problemDetails.Errors["Username"]);
+        Assert.Equal(
+            new[] { $"The Username field is required." },
+            problemDetails.Errors["Username"]
+        );
     }
 
     [Fact]
@@ -93,7 +112,10 @@ public class UserApiTests
         await application.CreateUserAsync("todouser", "p@assw0rd1");
 
         var client = application.CreateClient();
-        var response = await client.PostAsJsonAsync("/users/login", new UserInfo { Email = "todouser", Password = "p@assw0rd1" });
+        var response = await client.PostAsJsonAsync(
+            "/users/login",
+            new UserInfo { Email = "todouser", Password = "p@assw0rd1" }
+        );
 
         Assert.True(response.IsSuccessStatusCode);
 
@@ -118,11 +140,15 @@ public class UserApiTests
 
         var client = application.CreateClient();
 
-        var encryptedId = application.Services.GetRequiredService<IDataProtectionProvider>()
-                                    .CreateProtector("Google")
-                                    .Protect("1003");
+        var encryptedId = application
+            .Services.GetRequiredService<IDataProtectionProvider>()
+            .CreateProtector("Google")
+            .Protect("1003");
 
-        var response = await client.PostAsJsonAsync("/users/token/Google", new ExternalUserInfo { Username = "todouser", ProviderKey = encryptedId });
+        var response = await client.PostAsJsonAsync(
+            "/users/token/Google",
+            new ExternalUserInfo { Username = "todouser", ProviderKey = encryptedId }
+        );
 
         Assert.True(response.IsSuccessStatusCode);
 
@@ -153,7 +179,10 @@ public class UserApiTests
         await application.CreateUserAsync("todouser", "p@assw0rd1");
 
         var client = application.CreateClient();
-        var response = await client.PostAsJsonAsync("/users/login", new UserInfo { Email = "todouser", Password = "prd1" });
+        var response = await client.PostAsJsonAsync(
+            "/users/login",
+            new UserInfo { Email = "todouser", Password = "prd1" }
+        );
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }

@@ -4,9 +4,12 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-	<LangVersion>preview</LangVersion>
-
+    <LangVersion>preview</LangVersion>
     <!-- Treat all warnings as errors across the repo -->
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
+  <!-- Fail build if CSharpier would make any changes -->
+  <Target Name="CheckCSharpierFormatting" BeforeTargets="Build">
+    <Exec Command="dotnet csharpier check ." IgnoreExitCode="false" />
+  </Target>
 </Project>

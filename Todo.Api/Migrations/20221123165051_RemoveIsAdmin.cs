@@ -10,9 +10,7 @@ namespace TodoApi.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "IsAdmin",
-                table: "AspNetUsers");
+            migrationBuilder.DropColumn(name: "IsAdmin", table: "AspNetUsers");
         }
 
         /// <inheritdoc />
@@ -23,7 +21,8 @@ namespace TodoApi.Migrations
                 table: "AspNetUsers",
                 type: "INTEGER",
                 nullable: false,
-                defaultValue: false);
+                defaultValue: false
+            );
         }
     }
 }

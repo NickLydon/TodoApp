@@ -15,8 +15,7 @@ builder.Services.AddDataProtection(o => o.ApplicationDiscriminator = "TodoApp");
 // Must add client services
 builder.Services.AddScoped<TodoClient>();
 
-builder.Services.AddRazorComponents()
-                .AddInteractiveWebAssemblyComponents();
+builder.Services.AddRazorComponents().AddInteractiveWebAssemblyComponents();
 
 // Add the forwarder to make sending requests to the backend easier
 builder.Services.AddHttpForwarderWithServiceDiscovery();
@@ -46,12 +45,10 @@ app.UseHttpsRedirection();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
-app.MapRazorComponents<App>()
-   .AddInteractiveWebAssemblyRenderMode();
+app.MapRazorComponents<App>().AddInteractiveWebAssemblyRenderMode();
 
 // Configure the APIs
 app.MapAuth();
 app.MapTodos();
 
 app.Run();
-

@@ -10,13 +10,12 @@ namespace TodoApi.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Todos_AspNetUsers_OwnerId",
-                table: "Todos");
+            migrationBuilder.DropForeignKey(name: "FK_Todos_AspNetUsers_OwnerId", table: "Todos");
 
             migrationBuilder.DropUniqueConstraint(
                 name: "AK_AspNetUsers_UserName",
-                table: "AspNetUsers");
+                table: "AspNetUsers"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "UserName",
@@ -26,7 +25,8 @@ namespace TodoApi.Migrations
                 nullable: true,
                 oldClrType: typeof(string),
                 oldType: "TEXT",
-                oldMaxLength: 256);
+                oldMaxLength: 256
+            );
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Todos_AspNetUsers_OwnerId",
@@ -34,15 +34,14 @@ namespace TodoApi.Migrations
                 column: "OwnerId",
                 principalTable: "AspNetUsers",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Cascade
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Todos_AspNetUsers_OwnerId",
-                table: "Todos");
+            migrationBuilder.DropForeignKey(name: "FK_Todos_AspNetUsers_OwnerId", table: "Todos");
 
             migrationBuilder.AlterColumn<string>(
                 name: "UserName",
@@ -54,12 +53,14 @@ namespace TodoApi.Migrations
                 oldClrType: typeof(string),
                 oldType: "TEXT",
                 oldMaxLength: 256,
-                oldNullable: true);
+                oldNullable: true
+            );
 
             migrationBuilder.AddUniqueConstraint(
                 name: "AK_AspNetUsers_UserName",
                 table: "AspNetUsers",
-                column: "UserName");
+                column: "UserName"
+            );
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Todos_AspNetUsers_OwnerId",
@@ -67,7 +68,8 @@ namespace TodoApi.Migrations
                 column: "OwnerId",
                 principalTable: "AspNetUsers",
                 principalColumn: "UserName",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Cascade
+            );
         }
     }
 }

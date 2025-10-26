@@ -15,40 +15,55 @@ public static class RateLimitExtensions
 
         // Setup defaults for the TokenBucketRateLimiterOptions and read them from config if defined
         // In theory this could be per user using named options
-        services.AddOptions<TokenBucketRateLimiterOptions>()
-                .Configure(options =>
-                {
-                    // Set defaults
-                    options.ReplenishmentPeriod = TimeSpan.FromSeconds(10);
-                    options.AutoReplenishment = true;
-                    options.TokenLimit = 100;
-                    options.TokensPerPeriod = 100;
-                    options.QueueLimit = 100;
-                })
-                .BindConfiguration("RateLimiting");
+        services
+            .AddOptions<TokenBucketRateLimiterOptions>()
+            .Configure(options =>
+            {
+                // Set defaults
+                options.ReplenishmentPeriod = TimeSpan.FromSeconds(10);
+                options.AutoReplenishment = true;
+                options.TokenLimit = 100;
+                options.TokensPerPeriod = 100;
+                options.QueueLimit = 100;
+            })
+            .BindConfiguration("RateLimiting");
 
         // Setup the rate limiting policies taking the per user rate limiting options into account
-        services.AddOptions<RateLimiterOptions>()
-                .Configure((RateLimiterOptions options, IOptionsMonitor<TokenBucketRateLimiterOptions> perUserRateLimitingOptions) =>
-        {
-            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-
-            options.AddPolicy(Policy, context =>
-            {
-                // We always have a user name
-                var username = context.User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-
-                return RateLimitPartition.GetTokenBucketLimiter(username, key =>
+        services
+            .AddOptions<RateLimiterOptions>()
+            .Configure(
+                (
+                    RateLimiterOptions options,
+                    IOptionsMonitor<TokenBucketRateLimiterOptions> perUserRateLimitingOptions
+                ) =>
                 {
-                    return perUserRateLimitingOptions.CurrentValue;
-                });
-            });
-        });
+                    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+                    options.AddPolicy(
+                        Policy,
+                        context =>
+                        {
+                            // We always have a user name
+                            var username = context.User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+                            return RateLimitPartition.GetTokenBucketLimiter(
+                                username,
+                                key =>
+                                {
+                                    return perUserRateLimitingOptions.CurrentValue;
+                                }
+                            );
+                        }
+                    );
+                }
+            );
 
         return services;
     }
 
-    public static IEndpointConventionBuilder RequirePerUserRateLimit(this IEndpointConventionBuilder builder)
+    public static IEndpointConventionBuilder RequirePerUserRateLimit(
+        this IEndpointConventionBuilder builder
+    )
     {
         return builder.RequireRateLimiting(Policy);
     }

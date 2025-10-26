@@ -2,7 +2,11 @@
 
 internal static class DbContextExtensions
 {
-    public static IServiceCollection AddDbContextOptions<TContext>(this IServiceCollection services, Action<DbContextOptionsBuilder<TContext>> configure) where TContext : DbContext
+    public static IServiceCollection AddDbContextOptions<TContext>(
+        this IServiceCollection services,
+        Action<DbContextOptionsBuilder<TContext>> configure
+    )
+        where TContext : DbContext
     {
         // Remove the existing DbContextOptions
         // we want to override the settings and calling AddDbContext<TContext> again
@@ -17,7 +21,9 @@ internal static class DbContextExtensions
         services.AddSingleton(dbContextOptionsBuilder.Options);
 
         // The untyped version just calls the typed one
-        services.AddSingleton<DbContextOptions>(s => s.GetRequiredService<DbContextOptions<TContext>>());
+        services.AddSingleton<DbContextOptions>(s =>
+            s.GetRequiredService<DbContextOptions<TContext>>()
+        );
 
         return services;
     }

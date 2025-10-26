@@ -11,7 +11,7 @@ public static class OpenApiOptionsExtensions
         {
             Type = SecuritySchemeType.Http,
             Name = IdentityConstants.BearerScheme,
-            Scheme = "Bearer"
+            Scheme = "Bearer",
         };
 
         var reference = new OpenApiSecurityScheme()
@@ -19,25 +19,33 @@ public static class OpenApiOptionsExtensions
             Reference = new OpenApiReference
             {
                 Type = ReferenceType.SecurityScheme,
-                Id = IdentityConstants.BearerScheme
-            }
+                Id = IdentityConstants.BearerScheme,
+            },
         };
 
-        options.AddDocumentTransformer((document, context, cancellationToken) =>
-        {
-            document.Components ??= new OpenApiComponents();
-            document.Components.SecuritySchemes.Add(IdentityConstants.BearerScheme, scheme);
-            return Task.CompletedTask;
-        });
-
-        options.AddOperationTransformer((operation, context, cancellationToken) =>
-        {
-            if (context.Description.ActionDescriptor.EndpointMetadata.OfType<IAuthorizeData>().Any())
+        options.AddDocumentTransformer(
+            (document, context, cancellationToken) =>
             {
-                operation.Security = [new OpenApiSecurityRequirement { [reference] = [] }];
+                document.Components ??= new OpenApiComponents();
+                document.Components.SecuritySchemes.Add(IdentityConstants.BearerScheme, scheme);
+                return Task.CompletedTask;
             }
-            return Task.CompletedTask;
-        });
+        );
+
+        options.AddOperationTransformer(
+            (operation, context, cancellationToken) =>
+            {
+                if (
+                    context
+                        .Description.ActionDescriptor.EndpointMetadata.OfType<IAuthorizeData>()
+                        .Any()
+                )
+                {
+                    operation.Security = [new OpenApiSecurityRequirement { [reference] = [] }];
+                }
+                return Task.CompletedTask;
+            }
+        );
 
         return options;
     }

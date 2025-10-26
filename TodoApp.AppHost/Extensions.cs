@@ -1,6 +1,8 @@
 ﻿internal static class Extensions
 {
-    public static IResourceBuilder<ExecutableResource>? AddTodoDbMigration(this IDistributedApplicationBuilder builder)
+    public static IResourceBuilder<ExecutableResource>? AddTodoDbMigration(
+        this IDistributedApplicationBuilder builder
+    )
     {
         IResourceBuilder<ExecutableResource>? migrateOperation = default;
 
@@ -20,16 +22,36 @@
         return migrateOperation;
     }
 
-    public static IResourceBuilder<ExecutableResource> AddEfMigration<TProject>(this IDistributedApplicationBuilder builder, string name)
+    public static IResourceBuilder<ExecutableResource> AddEfMigration<TProject>(
+        this IDistributedApplicationBuilder builder,
+        string name
+    )
         where TProject : IProjectMetadata, new()
     {
         var projectDirectory = Path.GetDirectoryName(new TProject().ProjectPath)!;
 
         // Install the EF tool
-        var install = builder.AddExecutable("install-ef", "dotnet", projectDirectory, "tool", "install", "--global", "dotnet-ef");
+        var install = builder.AddExecutable(
+            "install-ef",
+            "dotnet",
+            projectDirectory,
+            "tool",
+            "install",
+            "--global",
+            "dotnet-ef"
+        );
 
         // TODO: Support passing a connection string
-        return builder.AddExecutable(name, "dotnet", projectDirectory, "ef", "database", "update", "--no-build")
+        return builder
+            .AddExecutable(
+                name,
+                "dotnet",
+                projectDirectory,
+                "ef",
+                "database",
+                "update",
+                "--no-build"
+            )
             .WaitForCompletion(install);
     }
 

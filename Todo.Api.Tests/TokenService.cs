@@ -5,13 +5,18 @@ using Microsoft.Extensions.Options;
 
 namespace TodoApi;
 
-public sealed class TokenService(SignInManager<TodoUser> signInManager, IOptionsMonitor<BearerTokenOptions> options)
+public sealed class TokenService(
+    SignInManager<TodoUser> signInManager,
+    IOptionsMonitor<BearerTokenOptions> options
+)
 {
     private readonly BearerTokenOptions _options = options.Get(IdentityConstants.BearerScheme);
 
     public async Task<string> GenerateTokenAsync(string username, bool isAdmin = false)
     {
-        var claimsPrincipal = await signInManager.CreateUserPrincipalAsync(new TodoUser { Id = username, UserName = username });
+        var claimsPrincipal = await signInManager.CreateUserPrincipalAsync(
+            new TodoUser { Id = username, UserName = username }
+        );
 
         if (isAdmin)
         {
@@ -25,11 +30,14 @@ public sealed class TokenService(SignInManager<TodoUser> signInManager, IOptions
 
         var properties = new AuthenticationProperties
         {
-            ExpiresUtc = utcNow + _options.BearerTokenExpiration
+            ExpiresUtc = utcNow + _options.BearerTokenExpiration,
         };
 
         var ticket = new AuthenticationTicket(
-            claimsPrincipal, properties, $"{IdentityConstants.BearerScheme}:AccessToken");
+            claimsPrincipal,
+            properties,
+            $"{IdentityConstants.BearerScheme}:AccessToken"
+        );
 
         return _options.BearerTokenProtector.Protect(ticket);
     }

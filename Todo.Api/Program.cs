@@ -15,12 +15,14 @@ builder.Services.AddAuthentication().AddBearerToken(IdentityConstants.BearerSche
 builder.Services.AddAuthorizationBuilder().AddCurrentUserHandler();
 
 // Configure identity
-builder.Services.AddIdentityCore<TodoUser>()
-                .AddEntityFrameworkStores<TodoDbContext>()
-                .AddApiEndpoints();
+builder
+    .Services.AddIdentityCore<TodoUser>()
+    .AddEntityFrameworkStores<TodoDbContext>()
+    .AddApiEndpoints();
 
 // Configure the database
-var connectionString = builder.Configuration.GetConnectionString("Todos") ?? "Data Source=.db/Todos.db";
+var connectionString =
+    builder.Configuration.GetConnectionString("Todos") ?? "Data Source=.db/Todos.db";
 builder.Services.AddSqlite<TodoDbContext>(connectionString);
 
 // State that represents the current user from the database *and* the request
@@ -51,7 +53,10 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference(options =>
     {
         options.Servers = [];
-        options.Authentication = new() { PreferredSecuritySchemes = [IdentityConstants.BearerScheme] };
+        options.Authentication = new()
+        {
+            PreferredSecuritySchemes = [IdentityConstants.BearerScheme],
+        };
     });
 }
 

@@ -5,10 +5,17 @@ namespace TodoApi;
 
 public static class ValidationFilterExtensions
 {
-    private static readonly ProducesResponseTypeMetadata ValidationErrorResponseMetadata = 
-        new(400, typeof(HttpValidationProblemDetails), ["application/problem+json"]);
+    private static readonly ProducesResponseTypeMetadata ValidationErrorResponseMetadata = new(
+        400,
+        typeof(HttpValidationProblemDetails),
+        ["application/problem+json"]
+    );
 
-    public static TBuilder WithParameterValidation<TBuilder>(this TBuilder builder, params Type[] typesToValidate) where TBuilder : IEndpointConventionBuilder
+    public static TBuilder WithParameterValidation<TBuilder>(
+        this TBuilder builder,
+        params Type[] typesToValidate
+    )
+        where TBuilder : IEndpointConventionBuilder
     {
         builder.Add(eb =>
         {
@@ -39,21 +46,26 @@ public static class ValidationFilterExtensions
             // We can respond with problem details if there's a validation error
             eb.Metadata.Add(ValidationErrorResponseMetadata);
 
-            eb.FilterFactories.Add((context, next) =>
-            {
-                return efic =>
+            eb.FilterFactories.Add(
+                (context, next) =>
                 {
-                    foreach (var index in parameterIndexesToValidate)
+                    return efic =>
                     {
-                        if (efic.Arguments[index] is { } arg && !MiniValidator.TryValidate(arg, out var errors))
+                        foreach (var index in parameterIndexesToValidate)
                         {
-                            return new ValueTask<object?>(Results.ValidationProblem(errors));
+                            if (
+                                efic.Arguments[index] is { } arg
+                                && !MiniValidator.TryValidate(arg, out var errors)
+                            )
+                            {
+                                return new ValueTask<object?>(Results.ValidationProblem(errors));
+                            }
                         }
-                    }
 
-                    return next(efic);
-                };
-            });
+                        return next(efic);
+                    };
+                }
+            );
         });
 
         return builder;

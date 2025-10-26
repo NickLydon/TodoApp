@@ -21,37 +21,51 @@ public static class UsersApi
 
         // The MapIdentityApi<T> doesn't expose an external login endpoint so we write this custom endpoint that follows
         // a similar pattern
-        group.MapPost("/token/{provider}", async Task<Results<Ok<AccessTokenResponse>, SignInHttpResult, ValidationProblem>> (string provider, ExternalUserInfo userInfo, UserManager<TodoUser> userManager, SignInManager<TodoUser> signInManager, IDataProtectionProvider dataProtectionProvider) =>
-        {
-            var protector = dataProtectionProvider.CreateProtector(provider);
-
-            var providerKey = protector.Unprotect(userInfo.ProviderKey);
-
-            var user = await userManager.FindByLoginAsync(provider, providerKey);
-
-            var result = IdentityResult.Success;
-
-            if (user is null)
+        group.MapPost(
+            "/token/{provider}",
+            async Task<Results<Ok<AccessTokenResponse>, SignInHttpResult, ValidationProblem>> (
+                string provider,
+                ExternalUserInfo userInfo,
+                UserManager<TodoUser> userManager,
+                SignInManager<TodoUser> signInManager,
+                IDataProtectionProvider dataProtectionProvider
+            ) =>
             {
-                user = new TodoUser() { UserName = userInfo.Username };
+                var protector = dataProtectionProvider.CreateProtector(provider);
 
-                result = await userManager.CreateAsync(user);
+                var providerKey = protector.Unprotect(userInfo.ProviderKey);
+
+                var user = await userManager.FindByLoginAsync(provider, providerKey);
+
+                var result = IdentityResult.Success;
+
+                if (user is null)
+                {
+                    user = new TodoUser() { UserName = userInfo.Username };
+
+                    result = await userManager.CreateAsync(user);
+
+                    if (result.Succeeded)
+                    {
+                        result = await userManager.AddLoginAsync(
+                            user,
+                            new UserLoginInfo(provider, providerKey, displayName: null)
+                        );
+                    }
+                }
 
                 if (result.Succeeded)
                 {
-                    result = await userManager.AddLoginAsync(user, new UserLoginInfo(provider, providerKey, displayName: null));
+                    var principal = await signInManager.CreateUserPrincipalAsync(user);
+
+                    return TypedResults.SignIn(principal);
                 }
+
+                return TypedResults.ValidationProblem(
+                    result.Errors.ToDictionary(e => e.Code, e => new[] { e.Description })
+                );
             }
-
-            if (result.Succeeded)
-            {
-                var principal = await signInManager.CreateUserPrincipalAsync(user);
-
-                return TypedResults.SignIn(principal);
-            }
-
-            return TypedResults.ValidationProblem(result.Errors.ToDictionary(e => e.Code, e => new[] { e.Description }));
-        });
+        );
 
         return group;
     }

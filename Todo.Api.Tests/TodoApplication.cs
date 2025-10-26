@@ -67,9 +67,13 @@ internal class TodoApplication : WebApplicationFactory<Program>
         base.Dispose(disposing);
     }
 
-    private sealed class AuthHandler(IServiceProvider services, string id, bool isAdmin) : DelegatingHandler
+    private sealed class AuthHandler(IServiceProvider services, string id, bool isAdmin)
+        : DelegatingHandler
     {
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken
+        )
         {
             await using var scope = services.CreateAsyncScope();
 

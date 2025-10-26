@@ -1,4 +1,3 @@
-
 using TodoEntities;
 
 namespace TodoApi.Tests;
@@ -49,7 +48,10 @@ public class TodoApiTests
         await application.CreateUserAsync(userId);
 
         var client = application.CreateClient(userId);
-        var response = await client.PostAsJsonAsync("/todos", new TodoItem { Title = "I want to do this thing tomorrow" });
+        var response = await client.PostAsJsonAsync(
+            "/todos",
+            new TodoItem { Title = "I want to do this thing tomorrow" }
+        );
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
@@ -256,7 +258,6 @@ public class TodoApiTests
         var updatedTodo = Assert.Single(todos);
         Assert.NotNull(updatedTodo);
         Assert.True(updatedTodo.IsComplete);
-
     }
 
     /// <summary>
