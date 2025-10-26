@@ -13,3 +13,4 @@
     <Exec Command="dotnet csharpier check ." IgnoreExitCode="false" />
   </Target>
 </Project>
+
