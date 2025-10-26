@@ -1,15 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <LangVersion>preview</LangVersion>
-    <!-- Treat all warnings as errors across the repo -->
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-  </PropertyGroup>
-  <!-- Fail build if CSharpier would make any changes -->
-  <Target Name="CheckCSharpierFormatting" BeforeTargets="Build">
-    <Exec Command="dotnet csharpier check ." IgnoreExitCode="false" />
-  </Target>
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <LangVersion>preview</LangVersion>
+        <!-- Treat all warnings as errors across the repo -->
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    </PropertyGroup>
+
+    <!-- Fail build if CSharpier would make any changes -->
+    <Target Name="CheckCSharpierFormatting" BeforeTargets="Build">
+        <Exec Command="dotnet csharpier check ." IgnoreExitCode="false"/>
+    </Target>
+
+    <!-- Include BannedSymbols.txt for analyzers in all projects -->
+    <ItemGroup>
+        <AdditionalFiles Include="$(SolutionDir)/BannedSymbols.txt"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers"/>
+    </ItemGroup>
 </Project>

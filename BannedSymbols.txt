@@ -1,0 +1,9 @@
+# BannedSymbols.txt for BannedApiAnalyzers
+# Use TimeProvider instead of direct DateTime/DateTimeOffset access
+
+P:System.DateTime.Now
+P:System.DateTime.UtcNow
+P:System.DateTime.Today
+P:System.DateTimeOffset.Now
+P:System.DateTimeOffset.UtcNow
+P:System.DateTimeOffset.Today
